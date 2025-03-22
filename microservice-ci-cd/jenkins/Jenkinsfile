@@ -14,7 +14,7 @@ pipeline {
         // Stage 1: Checkout Code
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-repo/microservice-ci-cd.git'
+                git branch: 'main', url: 'https://github.com/Jithendarramagiri1998/problem.git'
             }
         }
 
