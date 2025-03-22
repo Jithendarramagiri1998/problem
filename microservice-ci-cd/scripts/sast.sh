@@ -5,6 +5,6 @@ echo "Running SonarQube SAST..."
 sonar-scanner \
   -Dsonar.projectKey=my-microservice \
   -Dsonar.sources=./src \
-  -Dsonar.host.url=http://<sonarqube-server-ip>:9000 \
-  -Dsonar.login=<sonarqube-token>
+  -Dsonar.host.url=${SONARQUBE_URL} \
+  -Dsonar.login=${SONARQUBE_TOKEN}
 echo "SonarQube SAST completed!"
