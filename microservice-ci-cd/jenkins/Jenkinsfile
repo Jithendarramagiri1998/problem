@@ -22,7 +22,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh './scripts/build.sh'
+                    sh './microservice-ci-cd/scripts/build.sh'
                 }
             }
         }
@@ -30,8 +30,10 @@ pipeline {
         // Stage 3: Run SAST with SonarQube
         stage('Run SAST with SonarQube') {
             steps {
-                script {
-                    sh './scripts/sast.sh'
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONARQUBE_TOKEN')]) {
+                    script {
+                        sh './microservice-ci-cd/scripts/sast.sh'
+                    }
                 }
             }
         }
@@ -40,7 +42,7 @@ pipeline {
         stage('Scan Docker Image with Trivy') {
             steps {
                 script {
-                    sh './scripts/trivy-scan.sh'
+                    sh './microservice-ci-cd/scripts/trivy-scan.sh'
                 }
             }
         }
@@ -48,8 +50,10 @@ pipeline {
         // Stage 5: Deploy to Kubernetes
         stage('Deploy to Kubernetes') {
             steps {
-                script {
-                    sh './scripts/deploy.sh'
+                withCredentials([string(credentialsId: 'vault-token', variable: 'VAULT_TOKEN')]) {
+                    script {
+                        sh './microservice-ci-cd/scripts/deploy.sh'
+                    }
                 }
             }
         }
@@ -58,7 +62,7 @@ pipeline {
         stage('Run DAST with OWASP ZAP') {
             steps {
                 script {
-                    sh './scripts/dast.sh'
+                    sh './microservice-ci-cd/scripts/dast.sh'
                 }
             }
         }
@@ -67,7 +71,7 @@ pipeline {
         stage('Enforce Compliance with Kyverno') {
             steps {
                 script {
-                    sh './scripts/compliance.sh'
+                    sh './microservice-ci-cd/scripts/compliance.sh'
                 }
             }
         }
@@ -76,7 +80,7 @@ pipeline {
         stage('Monitor with Prometheus and Grafana') {
             steps {
                 script {
-                    sh './scripts/monitor.sh'
+                    sh './microservice-ci-cd/scripts/monitor.sh'
                 }
             }
         }
