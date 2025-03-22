@@ -311,6 +311,10 @@ metadata:
   name: my-microservice
   labels:
     app: my-microservice
+  annotations:
+    vault.hashicorp.com/agent-inject: "true"  # Enable Vault Agent Injector
+    vault.hashicorp.com/role: "my-microservice"  # Vault role for this application
+    vault.hashicorp.com/agent-inject-secret-db-credentials: "secret/data/my-microservice"  # Path to the secret in Vault
 spec:
   replicas: 3
   selector:
@@ -320,6 +324,10 @@ spec:
     metadata:
       labels:
         app: my-microservice
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "my-microservice"
+        vault.hashicorp.com/agent-inject-secret-db-credentials: "secret/data/my-microservice"
     spec:
       containers:
       - name: my-microservice
@@ -337,6 +345,9 @@ spec:
             secretKeyRef:
               name: my-secret
               key: password
+        envFrom:
+        - configMapRef:
+            name: my-config
 ```
 
 **Service Manifest (`k8s/service.yaml`)**:
@@ -365,8 +376,8 @@ metadata:
   name: my-secret
 type: Opaque
 data:
-  username: <base64-encoded-username>
-  password: <base64-encoded-password>
+  username: YWRtaW4=  # base64 encoded 'admin'
+  password: cGFzc3dvcmQ=  # base64 encoded 'password'
 ```
 
 **To encode values in Base64**:
