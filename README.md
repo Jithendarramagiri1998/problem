@@ -193,59 +193,81 @@ pipeline {
         KUBE_CONFIG = "--kubeconfig=/home/ec2-user/.kube/config"
         VAULT_ADDR = "http://<vault-server-ip>:8200"
         VAULT_TOKEN = "<vault-token>"
+        SONARQUBE_URL = "http://<sonarqube-server-ip>:9000"
+        SONARQUBE_TOKEN = "<sonarqube-token>"
     }
 
     stages {
-        stage('Checkout') {
+        // Stage 1: Checkout Code
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-repo/microservice.git'
+                git branch: 'main', url: 'https://github.com/Jithendarramagiri1998/problem.git'
             }
         }
 
+        // Stage 2: Build Docker Image
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t ${DOCKER_IMAGE} .'
+                    sh './microservice-ci-cd/scripts/build.sh'
                 }
             }
         }
 
-        stage('SAST with SonarQube') {
+        // Stage 3: Run SAST with SonarQube
+        stage('Run SAST with SonarQube') {
+            steps {
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONARQUBE_TOKEN')]) {
+                    script {
+                        sh './microservice-ci-cd/scripts/sast.sh'
+                    }
+                }
+            }
+        }
+
+        // Stage 4: Scan Docker Image with Trivy
+        stage('Scan Docker Image with Trivy') {
             steps {
                 script {
-                    sh 'sonar-scanner -Dsonar.projectKey=my-microservice -Dsonar.sources=. -Dsonar.host.url=http://<sonarqube-server-ip>:9000 -Dsonar.login=<sonarqube-token>'
+                    sh './microservice-ci-cd/scripts/trivy-scan.sh'
                 }
             }
         }
 
-        stage('Container Scan with Trivy') {
-            steps {
-                script {
-                    sh 'trivy image ${DOCKER_IMAGE}'
-                }
-            }
-        }
-
+        // Stage 5: Deploy to Kubernetes
         stage('Deploy to Kubernetes') {
             steps {
-                script {
-                    sh 'kubectl ${KUBE_CONFIG} apply -f k8s/deployment.yaml'
+                withCredentials([string(credentialsId: 'vault-token', variable: 'VAULT_TOKEN')]) {
+                    script {
+                        sh './microservice-ci-cd/scripts/deploy.sh'
+                    }
                 }
             }
         }
 
-        stage('DAST with OWASP ZAP') {
+        // Stage 6: Run DAST with OWASP ZAP
+        stage('Run DAST with OWASP ZAP') {
             steps {
                 script {
-                    sh 'zap-baseline.py -t http://<microservice-url>'
+                    sh './microservice-ci-cd/scripts/dast.sh'
                 }
             }
         }
 
-        stage('Compliance Check with AWS Security Hub') {
+        // Stage 7: Enforce Compliance with Kyverno
+        stage('Enforce Compliance with Kyverno') {
             steps {
                 script {
-                    sh 'aws securityhub get-findings'
+                    sh './microservice-ci-cd/scripts/compliance.sh'
+                }
+            }
+        }
+
+        // Stage 8: Monitor with Prometheus and Grafana
+        stage('Monitor with Prometheus and Grafana') {
+            steps {
+                script {
+                    sh './microservice-ci-cd/scripts/monitor.sh'
                 }
             }
         }
@@ -369,61 +391,81 @@ pipeline {
         KUBE_CONFIG = "--kubeconfig=/home/ec2-user/.kube/config"
         VAULT_ADDR = "http://<vault-server-ip>:8200"
         VAULT_TOKEN = "<vault-token>"
+        SONARQUBE_URL = "http://<sonarqube-server-ip>:9000"
+        SONARQUBE_TOKEN = "<sonarqube-token>"
     }
 
     stages {
-        stage('Checkout') {
+        // Stage 1: Checkout Code
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-repo/microservice.git'
+                git branch: 'main', url: 'https://github.com/Jithendarramagiri1998/problem.git'
             }
         }
 
+        // Stage 2: Build Docker Image
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t ${DOCKER_IMAGE} .'
+                    sh './microservice-ci-cd/scripts/build.sh'
                 }
             }
         }
 
-        stage('SAST with SonarQube') {
+        // Stage 3: Run SAST with SonarQube
+        stage('Run SAST with SonarQube') {
+            steps {
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONARQUBE_TOKEN')]) {
+                    script {
+                        sh './microservice-ci-cd/scripts/sast.sh'
+                    }
+                }
+            }
+        }
+
+        // Stage 4: Scan Docker Image with Trivy
+        stage('Scan Docker Image with Trivy') {
             steps {
                 script {
-                    sh 'sonar-scanner -Dsonar.projectKey=my-microservice -Dsonar.sources=. -Dsonar.host.url=http://<sonarqube-server-ip>:9000 -Dsonar.login=<sonarqube-token>'
+                    sh './microservice-ci-cd/scripts/trivy-scan.sh'
                 }
             }
         }
 
-        stage('Container Scan with Trivy') {
-            steps {
-                script {
-                    sh 'trivy image ${DOCKER_IMAGE}'
-                }
-            }
-        }
-
+        // Stage 5: Deploy to Kubernetes
         stage('Deploy to Kubernetes') {
             steps {
-                script {
-                    sh 'kubectl ${KUBE_CONFIG} apply -f k8s/secret.yaml'
-                    sh 'kubectl ${KUBE_CONFIG} apply -f k8s/deployment.yaml'
-                    sh 'kubectl ${KUBE_CONFIG} apply -f k8s/service.yaml'
+                withCredentials([string(credentialsId: 'vault-token', variable: 'VAULT_TOKEN')]) {
+                    script {
+                        sh './microservice-ci-cd/scripts/deploy.sh'
+                    }
                 }
             }
         }
 
-        stage('DAST with OWASP ZAP') {
+        // Stage 6: Run DAST with OWASP ZAP
+        stage('Run DAST with OWASP ZAP') {
             steps {
                 script {
-                    sh 'zap-baseline.py -t http://<microservice-url>'
+                    sh './microservice-ci-cd/scripts/dast.sh'
                 }
             }
         }
 
-        stage('Compliance Check with AWS Security Hub') {
+        // Stage 7: Enforce Compliance with Kyverno
+        stage('Enforce Compliance with Kyverno') {
             steps {
                 script {
-                    sh 'aws securityhub get-findings'
+                    sh './microservice-ci-cd/scripts/compliance.sh'
+                }
+            }
+        }
+
+        // Stage 8: Monitor with Prometheus and Grafana
+        stage('Monitor with Prometheus and Grafana') {
+            steps {
+                script {
+                    sh './microservice-ci-cd/scripts/monitor.sh'
                 }
             }
         }
