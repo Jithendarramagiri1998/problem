@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-microservice
+  labels:
+    app: my-microservice
+  annotations:
+    vault.hashicorp.com/agent-inject: "true"  # Enable Vault Agent Injector
+    vault.hashicorp.com/role: "my-microservice"  # Vault role for this application
+    vault.hashicorp.com/agent-inject-secret-db-credentials: "secret/data/my-microservice"  # Path to the secret in Vault
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-microservice
+  template:
+    metadata:
+      labels:
+        app: my-microservice
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "my-microservice"
+        vault.hashicorp.com/agent-inject-secret-db-credentials: "secret/data/my-microservice"
+    spec:
+      containers:
+      - name: my-microservice
+        image: my-microservice:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: password
+        envFrom:
+        - configMapRef:
+            name: my-config

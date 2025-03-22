@@ -1,0 +1,86 @@
+{
+    "dashboard": {
+      "id": null,
+      "uid": "kubernetes-microservice-dashboard",
+      "title": "Kubernetes Microservice Dashboard",
+      "tags": ["kubernetes", "microservice"],
+      "timezone": "browser",
+      "schemaVersion": 22,
+      "version": 1,
+      "refresh": "10s",
+      "panels": [
+        {
+          "id": 1,
+          "type": "graph",
+          "title": "CPU Usage",
+          "gridPos": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 8
+          },
+          "targets": [
+            {
+              "expr": "rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"my-microservice.*\"}[1m])",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "graph",
+          "title": "Memory Usage",
+          "gridPos": {
+            "x": 12,
+            "y": 0,
+            "w": 12,
+            "h": 8
+          },
+          "targets": [
+            {
+              "expr": "container_memory_usage_bytes{namespace=\"default\", pod=~\"my-microservice.*\"}",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "type": "graph",
+          "title": "HTTP Requests",
+          "gridPos": {
+            "x": 0,
+            "y": 8,
+            "w": 12,
+            "h": 8
+          },
+          "targets": [
+            {
+              "expr": "rate(http_requests_total{namespace=\"default\", pod=~\"my-microservice.*\"}[1m])",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "graph",
+          "title": "Error Rate",
+          "gridPos": {
+            "x": 12,
+            "y": 8,
+            "w": 12,
+            "h": 8
+          },
+          "targets": [
+            {
+              "expr": "rate(http_request_errors_total{namespace=\"default\", pod=~\"my-microservice.*\"}[1m])",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }
+  }

@@ -1,0 +1,28 @@
+# Trivy configuration file
+
+# Severity levels to report (CRITICAL, HIGH, MEDIUM, LOW, UNKNOWN)
+severity:
+  - CRITICAL
+  - HIGH
+
+# Ignore unfixed vulnerabilities
+ignore-unfixed: true
+
+# List of vulnerabilities to ignore (by vulnerability ID)
+ignore:
+  - CVE-2021-12345
+  - CVE-2021-67890
+
+# Timeout for scanning (in seconds)
+timeout: 300
+
+# Output format (table, json, template)
+format: table
+
+# Exit code when vulnerabilities are found
+exit-code: 1
+
+# Skip scanning specific directories or files
+skip-dirs:
+  - /var/lib/apt/lists
+  - /tmp

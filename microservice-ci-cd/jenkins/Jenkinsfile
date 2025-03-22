@@ -1,0 +1,93 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "my-microservice:latest"
+        KUBE_CONFIG = "--kubeconfig=/home/ec2-user/.kube/config"
+        VAULT_ADDR = "http://<vault-server-ip>:8200"
+        VAULT_TOKEN = "<vault-token>"
+        SONARQUBE_URL = "http://<sonarqube-server-ip>:9000"
+        SONARQUBE_TOKEN = "<sonarqube-token>"
+    }
+
+    stages {
+        // Stage 1: Checkout Code
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/your-repo/microservice-ci-cd.git'
+            }
+        }
+
+        // Stage 2: Build Docker Image
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh './scripts/build.sh'
+                }
+            }
+        }
+
+        // Stage 3: Run SAST with SonarQube
+        stage('Run SAST with SonarQube') {
+            steps {
+                script {
+                    sh './scripts/sast.sh'
+                }
+            }
+        }
+
+        // Stage 4: Scan Docker Image with Trivy
+        stage('Scan Docker Image with Trivy') {
+            steps {
+                script {
+                    sh './scripts/trivy-scan.sh'
+                }
+            }
+        }
+
+        // Stage 5: Deploy to Kubernetes
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh './scripts/deploy.sh'
+                }
+            }
+        }
+
+        // Stage 6: Run DAST with OWASP ZAP
+        stage('Run DAST with OWASP ZAP') {
+            steps {
+                script {
+                    sh './scripts/dast.sh'
+                }
+            }
+        }
+
+        // Stage 7: Enforce Compliance with Kyverno
+        stage('Enforce Compliance with Kyverno') {
+            steps {
+                script {
+                    sh './scripts/compliance.sh'
+                }
+            }
+        }
+
+        // Stage 8: Monitor with Prometheus and Grafana
+        stage('Monitor with Prometheus and Grafana') {
+            steps {
+                script {
+                    sh './scripts/monitor.sh'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}

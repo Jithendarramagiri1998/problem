@@ -1,0 +1,45 @@
+
+### **Complete `.gitignore` File**
+
+```gitignore
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
+# Ignore virtual environments
+venv/
+.env
+
+# Ignore dependency directories
+node_modules/
+vendor/
+
+# Ignore sensitive files
+*.key
+*.pem
+*.crt
+
+# Ignore Terraform state files
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Ignore Docker build cache
+**/docker-build/
+**/.dockerignore
+
+# Ignore log files
+*.log
+logs/
+
+# Ignore SonarQube reports
+sonar-reports/
+
+# Ignore Trivy reports
+trivy-reports/
+
+# Ignore OWASP ZAP reports
+zap-reports/
+
+# Ignore Kubernetes temporary files
+kubeconfig

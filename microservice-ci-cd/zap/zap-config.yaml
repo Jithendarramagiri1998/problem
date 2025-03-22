@@ -1,0 +1,46 @@
+# OWASP ZAP configuration file
+
+# Target URL to scan
+target: http://my-microservice:8080
+
+# Context for the scan
+context:
+  name: My Microservice Context
+  includePaths:
+    - http://my-microservice:8080/.*
+
+# Scan policy
+policy:
+  name: Default Policy
+  rules:
+    - id: 1
+      name: Cross Site Scripting (Reflected)
+      enabled: true
+    - id: 2
+      name: SQL Injection
+      enabled: true
+    - id: 3
+      name: Remote Code Execution
+      enabled: true
+
+# Authentication configuration (optional)
+authentication:
+  type: form
+  loginUrl: http://my-microservice:8080/login
+  username: admin
+  password: password
+
+# Spider configuration
+spider:
+  maxDepth: 5
+  maxChildren: 10
+
+# Active scan configuration
+activeScan:
+  maxRuleDurationInMins: 10
+  maxScanDurationInMins: 60
+
+# Reporting configuration
+report:
+  format: json
+  outputFile: zap-report.json
